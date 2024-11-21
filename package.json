@@ -14,8 +14,47 @@
   "contributes": {
     "commands": [
       {
-        "command": "daily-report.helloWorld",
-        "title": "Hello World"
+        "command": "daily-report.generateReport",
+        "title": "Dairy Report: Generate"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "Daily Report Settings",
+        "type": "object",
+        "properties": {
+          "daily-report.outputFormat": {
+            "type": "string",
+            "enum": [
+              "json",
+              "markdown"
+            ],
+            "default": "json",
+            "description": "The format of the generated report (json or markdown)."
+          },
+          "daily-report.outputPath": {
+            "type": "string",
+            "default": "${workspaceFolder}/daily_report",
+            "description": "The folder path where the report will be saved."
+          },
+          "daily-report.ignoreFiles": {
+            "type": "array",
+            "description": "List of file patterns to ignore when generating the daily report.",
+            "default": [
+              "package.json",
+              "package-lock.json",
+              "pnpm-lock.yaml",
+              "yarn.lock",
+              "*.config",
+              "*.conf"
+            ]
+          },
+          "daily-report.aiSummarizationEnabled": {
+            "type": "boolean",
+            "description": "Enable Automate Summarization with OpenAI (need to provide a openai api key)",
+            "default": false
+          }
+        }
       }
     ]
   },
@@ -31,20 +70,26 @@
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@types/vscode": "^1.95.0",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
+    "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
-    "eslint": "^9.13.0",
-    "esbuild": "^0.24.0",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.6.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.13.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
   },
-  "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
+  "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387",
+  "dependencies": {
+    "simple-git": "^3.27.0"
+  }
 }

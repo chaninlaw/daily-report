@@ -1,26 +1,27 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'
+import { generateReportCommand } from './commands/generateReport'
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  console.log('Extension "daily-report" is now active!')
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "daily-report" is now active!');
+  // Register the main command
+  const disposable = vscode.commands.registerCommand(
+    'daily-report.generateReport',
+    generateReportCommand
+  )
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('daily-report.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from daily-report!');
-	});
+  // Add a status bar item
+  const statusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+    100 // Priority
+  )
+  statusBarItem.text = '$(book) Generate Daily Report'
+  statusBarItem.tooltip = 'Click to generate a daily report from Git commits'
+  statusBarItem.command = 'daily-report.generateReport' // Trigger command
+  statusBarItem.show()
 
-	context.subscriptions.push(disposable);
+  // Clean up on deactivate
+  context.subscriptions.push(disposable, statusBarItem)
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
