@@ -39,6 +39,19 @@ export class ReportViewer {
     })
   }
 
+  public static async open(path: string): Promise<void> {
+    try {
+      // Open the file as a text document
+      const document = await vscode.workspace.openTextDocument(path);
+
+      // Show the document in the editor
+      await vscode.window.showTextDocument(document);
+    } catch (error: any) {
+      console.error('Error opening file:', error);
+      vscode.window.showErrorMessage(`Could not open file: ${error?.message ?? 'Unknown error'}`);
+    }
+  }
+
   private update(reportPath: string) {
     if (!fs.existsSync(reportPath)) {
       this.panel.webview.html = this.getErrorHtml()
