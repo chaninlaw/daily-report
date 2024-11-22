@@ -53,6 +53,11 @@
             "type": "boolean",
             "description": "Enable Automate Summarization with OpenAI (need to provide a openai api key)",
             "default": false
+          },
+          "daily-report.aiSummarizationEndpoint": {
+            "type": "string",
+            "default": "http://localhost:11434",
+            "description": "The endpoint of the AI summarization service."
           }
         }
       }
