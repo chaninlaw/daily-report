@@ -5,14 +5,15 @@ export async function generateReport(
   commits: { hash: string; message: string; diff: string }[],
   format: string,
   outputPath: string,
-  workspacePath: string
+  workspacePath: string,
+  replaceFileName?: string
 ) {
   const resolvedPath = outputPath.replace('${workspaceFolder}', workspacePath)
   if (!fs.existsSync(resolvedPath)) {
     fs.mkdirSync(resolvedPath, { recursive: true })
   }
 
-  const fileName = `daily_report.${format}`
+  const fileName = replaceFileName ?? `daily_report.${format}`
   if (format === 'json') {
     fs.writeFileSync(path.join(resolvedPath, fileName), JSON.stringify(commits, null, 2))
   } else if (format === 'markdown') {

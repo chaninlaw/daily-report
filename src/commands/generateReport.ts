@@ -6,6 +6,7 @@ import { ReportViewer } from '../webviews/reportViewer'
 import { OpenAI } from 'openai'
 import { getOpenAIKey } from '../services/openAI'
 import { summarizeCommitsWithAI } from '../services/summarizeCommit'
+import { DateGenerator } from '../utils/dateGenerator'
 
 export async function generateReportCommand() {
   try {
@@ -91,14 +92,16 @@ export async function generateReportCommand() {
 
         // Step 4: Generate the report
         const outputFormat = config.get<string>('outputFormat') || 'json'
-        const outputPath = config.get<string>('outputPath') || '${workspaceFolder}/daily_report'
+        const outputPath = config.get<string>('outputPath') || '${workspaceFolder}/daily_reports'
 
         const workspaceFolderPath = workspaceFolders[0].uri.fsPath
         const resolvedPath = outputPath.replace('${workspaceFolder}', workspaceFolderPath)
-        const fileName = `daily_report.${outputFormat}`
+
+        const dg = new DateGenerator();
+        const fileName = `${dg.formatDate(dg.getCurrentDate(), 'YYYY-MM-DD')}_report.${outputFormat}`
 
         const generatedFilePath = path.join(resolvedPath, fileName)
-        await generateReport(filteredCommits, outputFormat, outputPath, selectedPath)
+        await generateReport(filteredCommits, outputFormat, outputPath, selectedPath, fileName)
 
         const isAiSummarizationEnable = config.get<boolean>('aiSummarizationEnabled', false)
         if (isAiSummarizationEnable) {
@@ -123,7 +126,9 @@ export async function generateReportCommand() {
         }
 
         // Show the WebView
-        ReportViewer.show(vscode.Uri.file(__dirname), generatedFilePath)
+        // ReportViewer.show(vscode.Uri.file(__dirname), generatedFilePath)
+        ReportViewer.open(generatedFilePath)
+
 
         vscode.window.showInformationMessage(`Daily report generated successfully!`)
       }
