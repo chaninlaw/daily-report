@@ -4,7 +4,7 @@ import { getGitCommits } from '../services/gitService'
 import { generateReport } from '../services/reportGenerator'
 import { ReportViewer } from '../webviews/reportViewer'
 import { OpenAI } from 'openai'
-import { getOpenAIKey } from '../services/openai'
+import { getOpenAIKey } from '../services/openAI'
 import { summarizeCommitsWithAI } from '../services/summarizeCommit'
 
 export async function generateReportCommand() {
