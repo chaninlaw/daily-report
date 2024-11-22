@@ -1,7 +1,8 @@
 {
   "name": "daily-report",
-  "displayName": "daily-report",
-  "description": "ai generate daily report with your code changed",
+  "displayName": "Daily report",
+  "description": "AI generate daily report with your commit message",
+  "icon": "src/assets/dialy-report-logo.png",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.95.0"
