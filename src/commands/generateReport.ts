@@ -1,11 +1,12 @@
+
 import * as vscode from 'vscode'
 import path from 'path'
+
 import { getGitCommits } from '../services/gitService'
 import { generateReport } from '../services/reportGenerator'
+
 import { ReportViewer } from '../webviews/reportViewer'
-import { OpenAI } from 'openai'
-import { getOpenAIKey } from '../services/openAI'
-import { summarizeCommitsWithAI } from '../services/summarizeCommit'
+
 import { DateGenerator } from '../utils/dateGenerator'
 
 export async function generateReportCommand() {
@@ -92,7 +93,7 @@ export async function generateReportCommand() {
 
         // Step 4: Generate the report
         const outputFormat = config.get<string>('outputFormat') || 'json'
-        const outputPath = config.get<string>('outputPath') || '${workspaceFolder}/daily_reports'
+        const outputPath = config.get<string>('outputPath') || '${workspaceFolder}/daily_report'
 
         const workspaceFolderPath = workspaceFolders[0].uri.fsPath
         const resolvedPath = outputPath.replace('${workspaceFolder}', workspaceFolderPath)
@@ -103,27 +104,7 @@ export async function generateReportCommand() {
         const generatedFilePath = path.join(resolvedPath, fileName)
         await generateReport(filteredCommits, outputFormat, outputPath, selectedPath, fileName)
 
-        const isAiSummarizationEnable = config.get<boolean>('aiSummarizationEnabled', false)
-        if (isAiSummarizationEnable) {
-          const openaiKey = getOpenAIKey()
-          if (!openaiKey) {
-            throw new Error('OpenAI API key is not provided.')
-          }
-          // Extract diff content or relevant commit information
-          const commitMessages = filteredCommits.map((commit) => commit.diff).join('\n\n')
-          const openai = new OpenAI({
-            apiKey: openaiKey, // Use the key stored locally
-          })
-          const summary = await summarizeCommitsWithAI(commitMessages, openai)
-          if (summary) {
-            vscode.window.showInformationMessage('Summary generated!')
-            vscode.window.showTextDocument(vscode.Uri.parse(summary), {
-              preview: false,
-            })
-          } else {
-            vscode.window.showErrorMessage('AI summarization failed!')
-          }
-        }
+
 
         // Show the WebView
         // ReportViewer.show(vscode.Uri.file(__dirname), generatedFilePath)

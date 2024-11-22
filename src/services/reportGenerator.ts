@@ -1,5 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import * as vscode from 'vscode'
+
+import { LocalAIGenerator } from './localAI';
 
 export async function generateReport(
   commits: { hash: string; message: string; diff: string }[],
@@ -8,18 +11,31 @@ export async function generateReport(
   workspacePath: string,
   replaceFileName?: string
 ) {
+  const config = vscode.workspace.getConfiguration('daily-report')
+
   const resolvedPath = outputPath.replace('${workspaceFolder}', workspacePath)
   if (!fs.existsSync(resolvedPath)) {
     fs.mkdirSync(resolvedPath, { recursive: true })
   }
 
   const fileName = replaceFileName ?? `daily_report.${format}`
-  if (format === 'json') {
-    fs.writeFileSync(path.join(resolvedPath, fileName), JSON.stringify(commits, null, 2))
+
+  let summaryStr = ''
+  const isAiSummarizationEnable = config.get<boolean>('aiSummarizationEnabled', false)
+  if (isAiSummarizationEnable) {
+    const generator = new LocalAIGenerator(commits.map((commit) => commit.message).join(', '))
+    summaryStr = await generator.generate()
+    summaryStr = format === 'json' ? JSON.stringify({
+      type: 'AI Generated (Ollama v3.2 1b)',
+      summary: summaryStr,
+    }) : summaryStr
+  } else if (format === 'json') {
+    summaryStr = JSON.stringify(commits, null, 2)
   } else if (format === 'markdown') {
-    const markdownContent = generateMarkdown(commits)
-    fs.writeFileSync(path.join(resolvedPath, fileName), markdownContent)
+    summaryStr = generateMarkdown(commits)
   }
+
+  fs.writeFileSync(path.join(resolvedPath, fileName), summaryStr)
 }
 
 function generateMarkdown(changes: any[]): string {
