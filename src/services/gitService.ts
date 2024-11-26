@@ -14,6 +14,7 @@ export async function getGitCommits(workspacePath: string) {
   }
 
   const commits = await git.log({
+    '--all': null,
     '--after': since,
     '--author': user.value,
   })

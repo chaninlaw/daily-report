@@ -12,28 +12,30 @@ export class LocalAIGenerator {
             day: 'numeric',
         })}\n
         **1. Completed Tasks**\n
-        [Insert 2-3 bullet points summarizing completed tasks]\n
+        [Insert 2-:max-bullet bullet points summarizing completed tasks]\n
         **2. In Progress**\n
-        [Insert 2-3 bullet points summarizing ongoing tasks with progress percentages]\n
+        [Provide 2 to :max-bullet bullet points summarizing ongoing tasks with their respective progress percentages]\n
         **3. Issues**\n
-        [Insert 1-2 bullet points summarizing challenges or blockers]\n
-        **4. Tomorrow's Plan**\n
-        [Insert 2-3 bullet points summarizing planned tasks for the next day]\n
-        Generate the daily report based on this input:\n
+        [Insert 1-:max-bullet bullet points summarizing challenges or blockers]
         `
     }
 
     async generate() {
         const config = vscode.workspace.getConfiguration('daily-report')
-        const response = await fetch(`${config.get<string>('aiSummarizationEndpoint') || 'http://localhost:11434'}/api/generate`, {
+        const endpoint = config.get<string>('aiSummarizationEndpoint') || 'http://localhost:11434'
+        const model = config.get<string>('aiSummarizationModels') || 'llama3.2:1b'
+        const prefixPrompt = config.get<string>('aiSummarizationPrefixPrompt') || ''
+        const maxBullet = config.get<string>('maxBullet') || 3
+
+        const response = await fetch(`${endpoint}/api/generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 stream: false,
-                model: 'llama3.2:1b',
-                prompt: this.template + this.prompt
+                model: model,
+                prompt: `${prefixPrompt ? prefixPrompt + ' ' : ''}${this.template.replaceAll(':max-bullet', maxBullet.toString()) + this.prompt}`
             }),
         })
 
