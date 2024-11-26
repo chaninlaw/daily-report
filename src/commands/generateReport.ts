@@ -92,19 +92,15 @@ export async function generateReportCommand() {
         )
 
         // Step 4: Generate the report
+        progress.report({ message: 'Generating report...' })
         const outputFormat = config.get<string>('outputFormat') || 'json'
         const outputPath = config.get<string>('outputPath') || '${workspaceFolder}/daily_report'
-
         const workspaceFolderPath = workspaceFolders[0].uri.fsPath
         const resolvedPath = outputPath.replace('${workspaceFolder}', workspaceFolderPath)
-
         const dg = new DateGenerator();
         const fileName = `${dg.formatDate(dg.getCurrentDate(), 'YYYY-MM-DD')}_report.${outputFormat}`
-
         const generatedFilePath = path.join(resolvedPath, fileName)
         await generateReport(filteredCommits, outputFormat, outputPath, selectedPath, fileName)
-
-
 
         // Show the WebView
         // ReportViewer.show(vscode.Uri.file(__dirname), generatedFilePath)

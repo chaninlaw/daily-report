@@ -46,6 +46,11 @@
             "default": "${workspaceFolder}/daily_report",
             "description": "The folder path where the report will be saved."
           },
+          "daily-report.maxBullet": {
+            "type": "number",
+            "default": 5,
+            "description": "The max bullet for the AI summarization service."
+          },
           "daily-report.ignoreFiles": {
             "type": "array",
             "description": "List of file patterns to ignore when generating the daily report.",
@@ -67,6 +72,16 @@
             "type": "string",
             "default": "http://localhost:11434",
             "description": "The endpoint of the AI summarization service."
+          },
+          "daily-report.aiSummarizationModels": {
+            "type": "string",
+            "default": "llama3.2:1b",
+            "description": "The model to use for summarization."
+          },
+          "daily-report.aiSummarizationPrefixPrompt": {
+            "type": "string",
+            "default": "I am frontend developer, I need to write a daily report for my team.",
+            "description": "Prefix prompt for the AI summarization service."
           }
         }
       }
