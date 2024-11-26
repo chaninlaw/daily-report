@@ -26,7 +26,7 @@ export async function generateReport(
     const generator = new LocalAIGenerator(commits.map((commit) => commit.message).join(', '))
     summaryStr = await generator.generate()
     summaryStr = format === 'json' ? JSON.stringify({
-      type: 'AI Generated (Ollama v3.2 1b)',
+      type: 'AI Generated',
       summary: summaryStr,
     }) : summaryStr
   } else if (format === 'json') {
