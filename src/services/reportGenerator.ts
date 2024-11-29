@@ -24,7 +24,7 @@ export async function generateReport(
   const isAiSummarizationEnable = config.get<boolean>('aiSummarizationEnabled', false)
   if (isAiSummarizationEnable) {
     const generator = new LocalAIGenerator(commits.map((commit) => commit.message).join(', '))
-    summaryStr = await generator.generate()
+    summaryStr = await generator.generate(resolvedPath)
     summaryStr = format === 'json' ? JSON.stringify({
       type: 'AI Generated',
       summary: summaryStr,

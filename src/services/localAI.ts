@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+import * as path from 'path'
 import * as vscode from 'vscode'
 export class LocalAIGenerator {
     public template: string
@@ -20,12 +22,18 @@ export class LocalAIGenerator {
         `
     }
 
-    async generate() {
+    async generate(resolvedPath?: string, fileName?: string) {
         const config = vscode.workspace.getConfiguration('daily-report')
         const endpoint = config.get<string>('aiSummarizationEndpoint') || 'http://localhost:11434'
         const model = config.get<string>('aiSummarizationModels') || 'llama3.2:1b'
         const prefixPrompt = config.get<string>('aiSummarizationPrefixPrompt') || ''
         const maxBullet = config.get<string>('maxBullet') || 3
+
+        const finallyPrompt = `${prefixPrompt ? prefixPrompt + ' ' : ''}${this.template.replaceAll(':max-bullet', maxBullet.toString()) + this.prompt}`
+
+        if (resolvedPath) {
+            fs.writeFileSync(path.join(resolvedPath, `${fileName || 'Prompt'}.txt`), finallyPrompt)
+        }
 
         const response = await fetch(`${endpoint}/api/generate`, {
             method: 'POST',
@@ -35,7 +43,7 @@ export class LocalAIGenerator {
             body: JSON.stringify({
                 stream: false,
                 model: model,
-                prompt: `${prefixPrompt ? prefixPrompt + ' ' : ''}${this.template.replaceAll(':max-bullet', maxBullet.toString()) + this.prompt}`
+                prompt: finallyPrompt
             }),
         })
 
